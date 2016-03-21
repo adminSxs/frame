@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播图</title>
+</head>
+<link rel="stylesheet" href="css/style.css">
+<style>
+	ul,li{list-style: none}
+	.silder li{float: left;}
+
+</style>
+<body>
+	<div class="silder-box silder-box-1">
+		
+<ul class="silder">
+	<li><img src="img/01.jpg" alt=""></li>
+	<li><img src="img/02.jpg" alt=""></li>
+	<li><img src="img/03.jpg" alt=""></li>
+
+
+</ul>
+	<div class="silder-button btl"></div>
+	<div class="silder-button btr"></div>
+
+	</div>
+<script src="js/jquery-1.9.1.min.js"></script>
+<script src="js/mySystem.js"></script>
+<script>
+var index =0;
+$(".silder-box-1").mySilder({
+	width:400,
+	height:400,
+	auto:true,//自动滚动
+	autoTime:5,//自动滚动式，时间间隙为5秒
+	direction:"x",//滚动方向默认为x方向
+	autoType:"left",//滚动方向，auto为true才生效
+	few:1,//一次滚动的图片个数，默认滚动1张
+	showFew:1,//显示几张图片
+	clearance:50,//容器之间的间隙，默认为0
+	silderMode:"linear",//滚动方式
+	timeGap:650,//动画间歇，完成一次动画需要多长时间，默认为700ms
+	buttonPre:".silder-button.btl",//上一个，按钮
+	buttonNext:".silder-button.btr",//下一个，按钮
+	jz:true, //点击时，是否等待动画完成
+	runEnd:function(){
+		index++;
+		$(".cj em").text(index);
+	}
+})
+
+
+
+</script>
+</body>
+</html>
