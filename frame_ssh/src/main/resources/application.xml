@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+	
+	<context:annotation-config/>
+	<context:component-scan base-package="com.web.tosit.*"></context:component-scan>
+	<!-- c3p0数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/mydata"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="root"></property>
+		
+		<property name="acquireIncrement" value="5"></property>
+		<property name="initialPoolSize" value="10"></property>
+		<property name="minPoolSize" value="5"></property>
+		<property name="maxPoolSize" value="100"></property>
+		<property name="maxStatements" value="0"></property>
+		<property name="maxStatementsPerConnection" value="0"></property>
+		<property name="idleConnectionTestPeriod" value="60"></property>
+	</bean>
+	<!-- session工厂 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>				
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			
+			</props>
+		
+		</property>
+		
+		
+		
+		<property name="packagesToScan">
+			<list>
+				<value>com.web.tosit.entity</value>
+			</list>
+		</property>
+		
+	</bean>
+
+<!-- 事务管理器  -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	
+	<!-- 事物通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="sav*" propagation="REQUIRED" rollback-for="Exception"/> <!-- rollback-for回滚事物，果存在一个事务，则支持当前事务。如果没有事务则开启  -->
+			<tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="upd*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="qry*" propagation="NOT_SUPPORTED" read-only="true"/> 
+			<tx:method name="*" propagation="NOT_SUPPORTED" read-only="true"/>
+		</tx:attributes>  
+	</tx:advice> 
+
+	<!-- 事物切入 -->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="cut"
+			expression="execution(* com.web.tosit.service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="cut" />
+	</aop:config>
+
+	
+
+
+</beans>
